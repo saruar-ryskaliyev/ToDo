@@ -18,6 +18,7 @@ extension ToDoList {
 
     @NSManaged public var tasks: String?
     @NSManaged public var date: Date?
+    @NSManaged public var isSelected: Bool
 
 }
 

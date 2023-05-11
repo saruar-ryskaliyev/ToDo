@@ -9,31 +9,40 @@ import UIKit
 
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
- 
-
-    
-    private var tasks = [ToDoList]()
-    
+    let customCell = CustomCell()
+    let CoreDataModel = CoreDataManager()
     
     let tableView = UITableView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.tableView.delegate = self
-        self.tableView.dataSource = self
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        view.addSubview(tableView)
-        
-        let addTaskBarButton = UIBarButtonItem(title: "Add task", style: .done, target: self, action: #selector(addTask))
-        self.navigationItem.rightBarButtonItem  = addTaskBarButton
-        
-        
-        getAllItems()
-        
+       
+        createTable()
+        createNavButton()
+        CoreDataModel.getAllItems()
         
         title = "ToDo"
+
+     
+
+
+
     }
     
+    
+    
+
+    
+
+    
+    //MARK: - Navigation Controller
+    
+    func createNavButton(){
+        let addTaskBarButton = UIBarButtonItem(title: "Add task", style: .done, target: self, action: #selector(addTask))
+        self.navigationItem.rightBarButtonItem  = addTaskBarButton
+    }
+    
+    //MARK: - Alert Controller
     @objc func addTask(){
         let alert = UIAlertController(title: "Add Task", message: "Input your task", preferredStyle: .alert)
         
@@ -41,8 +50,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { [weak alert] (_) in
             let textField = alert?.textFields![0]
-            self.createItem(name: String(textField!.text!))
-            print(self.tasks)
+            self.CoreDataModel.createItem(name: String(textField!.text!))
+            
             
             DispatchQueue.main.async{
                 self.tableView.reloadData()
@@ -61,9 +70,24 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.frame = view.bounds
     }
     
+    
+    //MARK: - TableView
 
+    func createTable(){
+        self.tableView.delegate = self
+        self.tableView.dataSource = self
+        tableView.register(CustomCell.self, forCellReuseIdentifier: CustomCell.identifier)
+        tableView.backgroundColor = UIColor(red: 0.30, green: 0.30, blue: 0.43, alpha: 1.00)
+
+      
+        
+        view.addSubview(tableView)
+        
+
+    }
     
-    
+
+
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         
         return .delete
@@ -75,91 +99,83 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             
             tableView.deleteRows(at: [indexPath], with: .fade)
             
-            let task = tasks[indexPath.row]
+            let task = CoreDataModel.tasks[indexPath.row]
             
-            deleteItem(item: task)
+            
+            CoreDataModel.deleteItem(item: task)
             
             tableView.endUpdates()
         }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print("LOL")
-        return tasks.count
+        return CoreDataModel.tasks.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let task = tasks[indexPath.row]
+        let task = CoreDataModel.tasks[indexPath.row]
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        print("Hi")
+        let cell = tableView.dequeueReusableCell(withIdentifier: CustomCell.identifier, for: indexPath)
         
         cell.textLabel?.text = task.tasks
+        
+        
+        if task.isSelected{
+            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+            imageView.backgroundColor = .clear
+            imageView.image =  UIImage(systemName: "checkmark.circle.fill")
+            cell.accessoryView = imageView
+            
+        }else{
+            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+            imageView.backgroundColor = .clear
+            imageView.image =  UIImage(systemName: "checkmark.circle")
+            cell.accessoryView = imageView
+            task.isSelected = true
+            
+        }
+        
+        
+
+        
+        
+        
         
         return cell
     }
     
+
     
-    
-    
-    
-    //MARK: - CoreDataFunctions
-    
-    
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
-    func getAllItems(){
-        do{
-            tasks = try context.fetch(ToDoList.fetchRequest())
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let cell = tableView.cellForRow(at: indexPath)
+        
+        let task = CoreDataModel.tasks[indexPath.row]
+        
+        
+        if task.isSelected == true{
+            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+            imageView.backgroundColor = .clear
+            imageView.image =  UIImage(systemName: "checkmark.circle.fill")
+            cell?.accessoryView = imageView
+            task.isSelected = false
             
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
+            print("3")
             
-        }catch{
-            print(error)
-        }
-        
-    }
-    
-    func createItem(name: String){
-        
-        let newItem = ToDoList(context: context)
-        newItem.tasks = name
-        newItem.date = Date()
-        
-        do{
-            try context.save()
-            getAllItems()
-        }catch{
-            print(error)
-        }
-    }
-    
-    func deleteItem(item: ToDoList){
-        context.delete(item)
-        
-        do{
-            try context.save()
-            getAllItems()
-        }catch{
-            print(error)
+        }else{
+            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
+            imageView.backgroundColor = .clear
+            imageView.image =  UIImage(systemName: "checkmark.circle")
+            cell?.accessoryView = imageView
+            task.isSelected = true
+            
+            print("4")
+            
         }
         
         
+        tableView.deselectRow(at: indexPath, animated: true)
     }
-    
-    func updateItem(item: ToDoList, newName: String){
-        item.tasks = newName
-        
-        do{
-            try context.save()
-        }catch{
-            print(error)
-        }
-    }
-    
     
 
 
