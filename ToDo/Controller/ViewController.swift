@@ -121,7 +121,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         cell.textLabel?.text = task.tasks
         
         
-        if task.isSelected{
+        if task.isSelected == true{
             let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
             imageView.backgroundColor = .clear
             imageView.image =  UIImage(systemName: "checkmark.circle.fill")
@@ -132,7 +132,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             imageView.backgroundColor = .clear
             imageView.image =  UIImage(systemName: "checkmark.circle")
             cell.accessoryView = imageView
-            task.isSelected = true
+            
             
         }
         
@@ -158,7 +158,8 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             imageView.backgroundColor = .clear
             imageView.image =  UIImage(systemName: "checkmark.circle.fill")
             cell?.accessoryView = imageView
-            task.isSelected = false
+            
+            CoreDataModel.updateItem(item: task, newIsSelect: false)
             
             print("3")
             
@@ -167,10 +168,15 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             imageView.backgroundColor = .clear
             imageView.image =  UIImage(systemName: "checkmark.circle")
             cell?.accessoryView = imageView
-            task.isSelected = true
+            
+            CoreDataModel.updateItem(item: task, newIsSelect: true)
             
             print("4")
             
+        }
+        
+        DispatchQueue.main.async {
+            tableView.reloadData()
         }
         
         

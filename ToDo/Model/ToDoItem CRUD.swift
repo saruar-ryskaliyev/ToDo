@@ -58,9 +58,9 @@ class CoreDataManager{
         
     }
     
-    func updateItem(item: ToDoList, newName: String){
-        item.tasks = newName
+    func updateItem(item: ToDoList, newIsSelect: Bool){
         
+        item.isSelected = newIsSelect
         do{
             try context.save()
         }catch{
