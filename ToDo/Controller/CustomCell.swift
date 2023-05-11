@@ -13,10 +13,11 @@ class CustomCell: UITableViewCell{
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
 
-
+        self.contentView.layer.cornerRadius = 15
+        self.contentView.clipsToBounds = true
+        self.contentView.layer.borderWidth = 1
         
-//        self.contentView.backgroundColor = UIColor(red: 0.11, green: 0.61, blue: 0.52, alpha: 0.65)
-//    
+        self.contentView.backgroundColor = .systemGray
     }
     
     

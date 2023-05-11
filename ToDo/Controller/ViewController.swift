@@ -11,6 +11,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     
     let customCell = CustomCell()
     let CoreDataModel = CoreDataManager()
+    let cellSpacingHeight: CGFloat = 5
     
     let tableView = UITableView()
 
@@ -30,11 +31,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     }
     
     
-    
 
-    
-
-    
     //MARK: - Navigation Controller
     
     func createNavButton(){
@@ -77,17 +74,18 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         self.tableView.delegate = self
         self.tableView.dataSource = self
         tableView.register(CustomCell.self, forCellReuseIdentifier: CustomCell.identifier)
-        tableView.backgroundColor = UIColor(red: 0.30, green: 0.30, blue: 0.43, alpha: 1.00)
+     
 
-      
+        tableView.separatorStyle = .none
+        tableView.sectionHeaderTopPadding = 0
         
         view.addSubview(tableView)
         
 
     }
     
-
-
+ 
+    
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         
         return .delete
@@ -120,31 +118,29 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         cell.textLabel?.text = task.tasks
         
+        let imageView = UIImageView(frame: CGRect(x: 15, y: 0, width: 25, height: 25))
+        imageView.backgroundColor = .clear
+        
         
         if task.isSelected == true{
-            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-            imageView.backgroundColor = .clear
+
             imageView.image =  UIImage(systemName: "checkmark.circle.fill")
-            cell.accessoryView = imageView
+            
             
         }else{
-            let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30))
-            imageView.backgroundColor = .clear
+            
             imageView.image =  UIImage(systemName: "checkmark.circle")
-            cell.accessoryView = imageView
+           
             
             
         }
         
-        
+        cell.accessoryView = imageView
 
-        
-        
-        
-        
         return cell
     }
     
+
 
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
